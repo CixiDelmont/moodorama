@@ -1,0 +1,55 @@
+import { useEffect, useState } from 'react';
+import { getUserId } from './user';
+import { fetchMyMood } from './api';
+import type { MyMood } from './types';
+import MoodPicker from './components/MoodPicker';
+import MoodMap from './components/MoodMap';
+
+type Screen = 'loading' | 'picker' | 'map';
+
+export default function App() {
+  const [userId] = useState(getUserId);
+  const [screen, setScreen] = useState<Screen>('loading');
+  const [myMood, setMyMood] = useState<MyMood | null>(null);
+
+  // On first load, check whether this user already has an active mood.
+  useEffect(() => {
+    let cancelled = false;
+    fetchMyMood(userId)
+      .then((mood) => {
+        if (cancelled) return;
+        if (mood && mood.active) {
+          setMyMood(mood);
+          setScreen('map');
+        } else {
+          setScreen('picker');
+        }
+      })
+      .catch(() => {
+        if (!cancelled) setScreen('picker');
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [userId]);
+
+  if (screen === 'loading') {
+    return <div className="picker"><h1>Moodorama</h1><p className="subtitle">Loading…</p></div>;
+  }
+
+  if (screen === 'map' && myMood) {
+    return <MoodMap myMood={myMood} onChangeMood={() => setScreen('picker')} />;
+  }
+
+  return (
+    <MoodPicker
+      userId={userId}
+      current={myMood}
+      onSaved={(mood) => {
+        setMyMood(mood);
+        setScreen('map');
+      }}
+      onCancel={myMood?.active ? () => setScreen('map') : undefined}
+    />
+  );
+}

@@ -1,0 +1,17 @@
+# Dependencies
+node_modules/
+vendor/
+
+# Build output
+frontend/dist/
+frontend/.vite/
+
+# Local config / secrets
+backend/config.php
+frontend/.env
+frontend/.env.local
+
+# Logs & OS cruft
+*.log
+.DS_Store
+Thumbs.db

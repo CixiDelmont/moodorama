@@ -1,0 +1,8 @@
+# Route every request that is not a real file/dir to index.php (Apache).
+# Not needed for the PHP built-in server (it uses index.php as the router).
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^ router.php [QSA,L]
+</IfModule>
