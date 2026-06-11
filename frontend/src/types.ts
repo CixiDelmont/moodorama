@@ -2,6 +2,7 @@ export type Mood = 'joy' | 'fear' | 'sadness' | 'disgust' | 'anger';
 
 /** A single active mood point returned by GET /api/moods. */
 export interface MoodPoint {
+  id: number;
   mood: Mood;
   latitude: number;
   longitude: number;

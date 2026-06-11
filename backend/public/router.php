@@ -5,7 +5,7 @@
  *
  * Routes:
  *   GET  /api/health        -> { ok: true }
- *   GET  /api/moods         -> [ { mood, latitude, longitude, updatedAt, expiresAt }, ... ]  (active only)
+ *   GET  /api/moods         -> [ { id, mood, latitude, longitude, updatedAt, expiresAt }, ... ]  (active only)
  *   GET  /api/moods/me      -> current user's mood (requires ?userId=)
  *   POST /api/moods         -> upsert { userId, mood, latitude, longitude }
  */

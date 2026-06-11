@@ -56,13 +56,14 @@ final class MoodRepository
      */
     public function activeMoods(): array
     {
-        $sql = 'SELECT mood, latitude, longitude, updated_at, expires_at
+        $sql = 'SELECT id, mood, latitude, longitude, updated_at, expires_at
                 FROM moods
                 WHERE expires_at > NOW()';
         $rows = $this->pdo->query($sql)->fetchAll();
 
         return array_map(static function (array $r): array {
             return [
+                'id'        => (int) $r['id'],
                 'mood'      => $r['mood'],
                 'latitude'  => (float) $r['latitude'],
                 'longitude' => (float) $r['longitude'],
@@ -75,7 +76,7 @@ final class MoodRepository
     public function findByUser(string $userId): ?array
     {
         $stmt = $this->pdo->prepare(
-            'SELECT user_id, mood, latitude, longitude, updated_at, expires_at
+            'SELECT id, user_id, mood, latitude, longitude, updated_at, expires_at
              FROM moods WHERE user_id = :user_id'
         );
         $stmt->execute([':user_id' => $userId]);
@@ -88,6 +89,7 @@ final class MoodRepository
         $active = strtotime($row['expires_at']) > time();
 
         return [
+            'id'        => (int) $row['id'],
             'userId'    => $row['user_id'],
             'mood'      => $row['mood'],
             'latitude'  => (float) $row['latitude'],

@@ -24,8 +24,11 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   return (text ? JSON.parse(text) : null) as T;
 }
 
-export function fetchActiveMoods(): Promise<MoodPoint[]> {
-  return request<MoodPoint[]>('/moods');
+export async function fetchActiveMoods(): Promise<MoodPoint[]> {
+  const data = await request<MoodPoint[] | MoodPoint | null>('/moods');
+  if (Array.isArray(data)) return data;
+  if (data) return [data];
+  return [];
 }
 
 export function fetchMyMood(userId: string): Promise<MyMood | null> {

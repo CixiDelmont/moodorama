@@ -15,7 +15,7 @@ import Map from 'react-map-gl/maplibre';
 import 'maplibre-gl/dist/maplibre-gl.css';
 
 import type { MoodPoint, MyMood } from '../types';
-import { MOOD_BY_ID } from '../moods';
+import { MOOD_BY_ID, mixedMoodRgb } from '../moods';
 import { fetchActiveMoods } from '../api';
 import { binMoods, resolutionForZoom, type HexBin } from '../lib/h3';
 import Legend from './Legend';
@@ -100,12 +100,12 @@ export default function MoodMap({ myMood, onChangeMood }: Props) {
     lineWidthMinPixels: 1,
     getHexagon: (d) => d.hex,
     getFillColor: (d) => {
-      const [r, g, b] = MOOD_BY_ID[d.dominantMood].rgb;
-      return [r, g, b, 205];
+      const [r, g, b] = mixedMoodRgb(d.counts);
+      return [r, g, b, 255];
     },
     getLineColor: [255, 255, 255, 40],
     updateTriggers: {
-      getFillColor: [resolution],
+      getFillColor: [resolution, points.length],
     },
     ...(viewMode === 'globe' && {
       // Always draw mood data above draped country polygons on the globe surface.
@@ -185,7 +185,7 @@ export default function MoodMap({ myMood, onChangeMood }: Props) {
       <div className="overlay top-left">
         <div className="brand">
           Moodorama
-          <small>The world&apos;s feelings, live. Hexagons show the dominant mood.</small>
+          <small>The world&apos;s feelings, live. Hexagons blend mood colors by share.</small>
         </div>
         <div className="your-mood">
           Your mood:
@@ -230,7 +230,13 @@ function getTooltip({ object }: { object?: HexBin | null }) {
   const breakdown = (Object.keys(object.counts) as (keyof typeof object.counts)[])
     .filter((m) => object.counts[m] > 0)
     .sort((a, b) => object.counts[b] - object.counts[a])
-    .map((m) => `${MOOD_BY_ID[m].emoji} ${MOOD_BY_ID[m].label}: ${object.counts[m]}`)
+    .map((m) => {
+      const row =
+        object.total === 1 && object.moodRowId != null
+          ? ` <span style="opacity:0.7">#${object.moodRowId}</span>`
+          : '';
+      return `${MOOD_BY_ID[m].emoji} ${MOOD_BY_ID[m].label}: ${object.counts[m]}${row}`;
+    })
     .join('<br/>');
 
   return {

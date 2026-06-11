@@ -9,6 +9,8 @@ export interface HexBin {
   total: number;
   /** Count per mood. */
   counts: Record<Mood, number>;
+  /** DB row id when exactly one mood point falls in this hex. */
+  moodRowId?: number;
 }
 
 /**
@@ -49,22 +51,28 @@ const EMPTY_COUNTS = (): Record<Mood, number> => ({
  * Buckets mood points into H3 cells at the given resolution and determines the
  * dominant mood for each cell.
  */
+interface BinAccumulator {
+  counts: Record<Mood, number>;
+  pointIds: number[];
+}
+
 export function binMoods(points: MoodPoint[], resolution: number): HexBin[] {
-  const bins = new Map<string, Record<Mood, number>>();
+  const bins = new Map<string, BinAccumulator>();
 
   for (const p of points) {
     if (!Number.isFinite(p.latitude) || !Number.isFinite(p.longitude)) continue;
     const hex = latLngToCell(p.latitude, p.longitude, resolution);
-    let counts = bins.get(hex);
-    if (!counts) {
-      counts = EMPTY_COUNTS();
-      bins.set(hex, counts);
+    let bin = bins.get(hex);
+    if (!bin) {
+      bin = { counts: EMPTY_COUNTS(), pointIds: [] };
+      bins.set(hex, bin);
     }
-    counts[p.mood] += 1;
+    bin.counts[p.mood] += 1;
+    bin.pointIds.push(p.id);
   }
 
   const result: HexBin[] = [];
-  for (const [hex, counts] of bins) {
+  for (const [hex, { counts, pointIds }] of bins) {
     let dominantMood: Mood = 'joy';
     let best = -1;
     let total = 0;
@@ -76,7 +84,13 @@ export function binMoods(points: MoodPoint[], resolution: number): HexBin[] {
         dominantMood = mood;
       }
     });
-    result.push({ hex, dominantMood, total, counts });
+    result.push({
+      hex,
+      dominantMood,
+      total,
+      counts,
+      ...(total === 1 && pointIds.length === 1 ? { moodRowId: pointIds[0] } : {}),
+    });
   }
   return result;
 }
