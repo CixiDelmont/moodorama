@@ -5,9 +5,9 @@
  *
  * Routes:
  *   GET  /api/health        -> { ok: true }
- *   GET  /api/moods         -> [ { id, mood, latitude, longitude, updatedAt, expiresAt }, ... ]  (active only)
+ *   GET  /api/moods         -> [ { id, mood, alias?, latitude, longitude, updatedAt, expiresAt }, ... ]  (active only)
  *   GET  /api/moods/me      -> current user's mood (requires ?userId=)
- *   POST /api/moods         -> upsert { userId, mood, latitude, longitude }
+ *   POST /api/moods         -> upsert { userId, mood, alias?, latitude, longitude }
  */
 
 declare(strict_types=1);
@@ -76,8 +76,14 @@ try {
                 Http::error('latitude/longitude out of range', 422);
             }
 
+            try {
+                $alias = MoodRepository::normalizeAlias($body['alias'] ?? null);
+            } catch (\InvalidArgumentException $e) {
+                Http::error($e->getMessage(), 422);
+            }
+
             $repo = new MoodRepository(Database::connection());
-            $saved = $repo->upsert($userId, $mood, $lat, $lng);
+            $saved = $repo->upsert($userId, $mood, $lat, $lng, $alias);
             Http::json($saved, 201);
             // no break
 

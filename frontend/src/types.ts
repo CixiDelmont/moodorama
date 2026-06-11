@@ -4,6 +4,8 @@ export type Mood = 'joy' | 'fear' | 'sadness' | 'disgust' | 'anger';
 export interface MoodPoint {
   id: number;
   mood: Mood;
+  /** Optional display name shown on the map when alone in a hex. */
+  alias?: string;
   latitude: number;
   longitude: number;
   updatedAt: string;

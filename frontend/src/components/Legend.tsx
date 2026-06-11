@@ -1,9 +1,20 @@
+import type { CSSProperties } from 'react';
 import { MOODS } from '../moods';
+
+const STRIPE_SAMPLE: CSSProperties = {
+  background: `repeating-linear-gradient(
+    45deg,
+    #ffd13b,
+    #ffd13b 4px,
+    #4c9be8 4px,
+    #4c9be8 8px
+  )`,
+};
 
 export default function Legend() {
   return (
     <div className="overlay bottom-left legend">
-      <h4>Dominant mood</h4>
+      <h4>Mood colours</h4>
       {MOODS.map((m) => (
         <div className="legend-row" key={m.id}>
           <span className="swatch" style={{ background: m.hex }} />
@@ -12,6 +23,10 @@ export default function Legend() {
           </span>
         </div>
       ))}
+      <div className="legend-row" style={{ marginTop: 8 }}>
+        <span className="swatch" style={STRIPE_SAMPLE} />
+        <span>Mixed (30%+ each)</span>
+      </div>
     </div>
   );
 }

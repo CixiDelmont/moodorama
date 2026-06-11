@@ -38,6 +38,7 @@ export function fetchMyMood(userId: string): Promise<MyMood | null> {
 export function submitMood(params: {
   userId: string;
   mood: Mood;
+  alias?: string;
   latitude: number;
   longitude: number;
 }): Promise<MyMood> {

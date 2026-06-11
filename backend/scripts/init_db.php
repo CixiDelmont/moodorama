@@ -36,6 +36,7 @@ $pdo->exec(
         id          BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
         user_id     CHAR(36)        NOT NULL,
         mood        ENUM('joy', 'fear', 'sadness', 'disgust', 'anger') NOT NULL,
+        alias       VARCHAR(32)     NULL,
         latitude    DOUBLE          NOT NULL,
         longitude   DOUBLE          NOT NULL,
         created_at  DATETIME        NOT NULL,
@@ -46,5 +47,11 @@ $pdo->exec(
         KEY idx_expires (expires_at)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
 );
+
+$hasAlias = $pdo->query("SHOW COLUMNS FROM moods LIKE 'alias'")->fetch();
+if ($hasAlias === false) {
+    $pdo->exec('ALTER TABLE moods ADD COLUMN alias VARCHAR(32) NULL DEFAULT NULL AFTER mood');
+    echo "Added alias column to moods.\n";
+}
 
 echo "Database '$name' and table 'moods' are ready.\n";

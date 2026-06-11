@@ -4,6 +4,8 @@ import type { Mood, MyMood } from '../types';
 import { getCurrentLocation } from '../lib/geo';
 import { submitMood } from '../api';
 
+const ALIAS_MAX = 32;
+
 interface Props {
   userId: string;
   current?: MyMood | null;
@@ -12,6 +14,7 @@ interface Props {
 }
 
 export default function MoodPicker({ userId, current, onSaved, onCancel }: Props) {
+  const [alias, setAlias] = useState(current?.alias ?? '');
   const [pending, setPending] = useState<Mood | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -20,7 +23,14 @@ export default function MoodPicker({ userId, current, onSaved, onCancel }: Props
     setPending(mood);
     try {
       const { latitude, longitude } = await getCurrentLocation();
-      const saved = await submitMood({ userId, mood, latitude, longitude });
+      const trimmed = alias.trim();
+      const saved = await submitMood({
+        userId,
+        mood,
+        latitude,
+        longitude,
+        ...(trimmed ? { alias: trimmed } : {}),
+      });
       onSaved(saved);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Something went wrong.');
@@ -35,6 +45,20 @@ export default function MoodPicker({ userId, current, onSaved, onCancel }: Props
         Pick one of the five core emotions. Your mood joins a live heatmap of how the
         world feels right now, and stays yours for the next 12 hours.
       </p>
+
+      <label className="alias-field">
+        <span className="alias-label">Name or alias (optional)</span>
+        <input
+          type="text"
+          className="alias-input"
+          value={alias}
+          maxLength={ALIAS_MAX}
+          placeholder="e.g. Alex, NightOwl…"
+          disabled={pending !== null}
+          onChange={(e) => setAlias(e.target.value)}
+        />
+        <span className="alias-hint">Shown on the map when your hex is alone. Max {ALIAS_MAX} chars.</span>
+      </label>
 
       <div className="mood-grid">
         {MOODS.map((m) => (
@@ -56,7 +80,7 @@ export default function MoodPicker({ userId, current, onSaved, onCancel }: Props
       {pending && <p className="hint">Finding your location…</p>}
       {!pending && (
         <p className="hint">
-          We use your location only to place a single anonymous hexagon on the map.
+          We use your location only to place a single hexagon on the map.
         </p>
       )}
 

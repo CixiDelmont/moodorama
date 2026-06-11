@@ -13,6 +13,7 @@ CREATE TABLE IF NOT EXISTS moods (
   id          BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   user_id     CHAR(36)        NOT NULL,
   mood        ENUM('joy', 'fear', 'sadness', 'disgust', 'anger') NOT NULL,
+  alias       VARCHAR(32)     NULL,
   latitude    DOUBLE          NOT NULL,
   longitude   DOUBLE          NOT NULL,
   created_at  DATETIME        NOT NULL,
