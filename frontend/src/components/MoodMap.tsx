@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from 'react';
 
 import DeckGL from '@deck.gl/react';
 
@@ -9,6 +9,8 @@ import {
   _GlobeView as GlobeView,
 
   COORDINATE_SYSTEM,
+
+  FlyToInterpolator,
 
   type Layer,
 
@@ -34,11 +36,18 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 
 import type { MoodPoint, MyMood } from '../types';
 
-import { MOOD_BY_ID } from '../moods';
+import { MOOD_BY_ID, moodIconHtml } from '../moods';
+import MoodIcon from './MoodIcon';
 
 import { fetchActiveMoods } from '../api';
 
 import { binMoods, resolutionForZoom, type HexBin } from '../lib/h3';
+import {
+  boundsFromViewState,
+  expandBounds,
+  filterPointsInBounds,
+  paddingForResolution,
+} from '../lib/viewport';
 
 import type { StripeFacet } from '../lib/hex-polygon';
 
@@ -59,6 +68,7 @@ const COUNTRIES =
 const REFRESH_MS = 60_000;
 
 const EARTH_RADIUS_M = 6.3e6;
+const FOCUS_ZOOM = 14;
 
 
 
@@ -68,7 +78,7 @@ type ViewMode = 'map' | 'globe';
 
 function normalizeViewState(next: MapViewState, mode: ViewMode): MapViewState {
 
-  return {
+  const normalized: MapViewState = {
 
     longitude: next.longitude,
 
@@ -85,6 +95,16 @@ function normalizeViewState(next: MapViewState, mode: ViewMode): MapViewState {
     maxZoom: 14,
 
   };
+
+  if (next.transitionDuration != null) normalized.transitionDuration = next.transitionDuration;
+
+  if (next.transitionInterpolator != null) {
+
+    normalized.transitionInterpolator = next.transitionInterpolator;
+
+  }
+
+  return normalized;
 
 }
 
@@ -139,6 +159,23 @@ export default function MoodMap({ myMood, onChangeMood }: Props) {
 
 
   const refreshTimer = useRef<number | null>(null);
+  const mapRef = useRef<HTMLDivElement>(null);
+  const [mapSize, setMapSize] = useState({ width: 0, height: 0 });
+
+  useEffect(() => {
+    const el = mapRef.current;
+    if (!el) return;
+
+    const sync = () => {
+      const { width, height } = el.getBoundingClientRect();
+      setMapSize({ width: Math.round(width), height: Math.round(height) });
+    };
+
+    sync();
+    const ro = new ResizeObserver(sync);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
 
 
 
@@ -182,9 +219,23 @@ export default function MoodMap({ myMood, onChangeMood }: Props) {
 
 
 
-  const resolution = resolutionForZoom(viewState.zoom);
+  const deferredViewState = useDeferredValue(viewState);
+  const cullViewState = viewMode === 'map' ? deferredViewState : viewState;
+  const resolution = resolutionForZoom(cullViewState.zoom);
 
-  const bins = useMemo(() => binMoods(points, resolution), [points, resolution]);
+  const visiblePoints = useMemo(() => {
+    if (viewMode !== 'map' || mapSize.width < 1 || mapSize.height < 1) {
+      return points;
+    }
+    const bounds = boundsFromViewState(cullViewState, mapSize.width, mapSize.height);
+    const padded = expandBounds(bounds, paddingForResolution(resolution));
+    return filterPointsInBounds(points, padded);
+  }, [points, cullViewState, viewMode, mapSize.width, mapSize.height, resolution]);
+
+  const bins = useMemo(
+    () => binMoods(visiblePoints, resolution),
+    [visiblePoints, resolution],
+  );
 
   const { solidBins, stripeBins } = useMemo(() => partitionBins(bins), [bins]);
 
@@ -292,7 +343,7 @@ export default function MoodMap({ myMood, onChangeMood }: Props) {
 
         getLineColor: [255, 255, 255, 40],
 
-        updateTriggers: { getFillColor: [resolution, points.length] },
+        updateTriggers: { getFillColor: [resolution, visiblePoints.length] },
 
         ...globeParams,
 
@@ -326,7 +377,7 @@ export default function MoodMap({ myMood, onChangeMood }: Props) {
 
           getLineColor: [255, 255, 255, 40],
 
-          updateTriggers: { getFillColor: [resolution, points.length] },
+          updateTriggers: { getFillColor: [resolution, visiblePoints.length] },
 
           ...globeParams,
 
@@ -340,7 +391,7 @@ export default function MoodMap({ myMood, onChangeMood }: Props) {
 
     return layers;
 
-  }, [solidBins, stripeFacets, viewMode, resolution, points.length]);
+  }, [solidBins, stripeFacets, viewMode, resolution, visiblePoints.length]);
 
 
 
@@ -386,7 +437,21 @@ export default function MoodMap({ myMood, onChangeMood }: Props) {
 
   }, []);
 
-
+  const flyToMyMood = useCallback(() => {
+    setViewState((prev) =>
+      normalizeViewState(
+        {
+          ...prev,
+          longitude: myMood.longitude,
+          latitude: myMood.latitude,
+          zoom: FOCUS_ZOOM,
+          transitionDuration: 1200,
+          transitionInterpolator: new FlyToInterpolator(),
+        },
+        viewMode,
+      ),
+    );
+  }, [myMood.latitude, myMood.longitude, viewMode]);
 
   const mine = MOOD_BY_ID[myMood.mood];
 
@@ -394,7 +459,7 @@ export default function MoodMap({ myMood, onChangeMood }: Props) {
 
   return (
 
-    <div className="map-root">
+    <div className="map-root" ref={mapRef}>
 
       {loading && <div className="loading-pill">Loading moods…</div>}
 
@@ -406,7 +471,7 @@ export default function MoodMap({ myMood, onChangeMood }: Props) {
 
         views={views}
 
-        initialViewState={viewState}
+        viewState={viewState}
 
         controller
 
@@ -432,7 +497,7 @@ export default function MoodMap({ myMood, onChangeMood }: Props) {
 
           <small>
 
-            The world&apos;s feelings, live. Mixed hexes use diagonal stripes (30%+ each).
+            The world&apos;s feelings, live. {/* Mixed hexes use diagonal stripes (30%+ each). */}
 
           </small>
 
@@ -442,13 +507,20 @@ export default function MoodMap({ myMood, onChangeMood }: Props) {
 
           Your mood:
 
-          <span className="chip" style={{ background: mine.hex }}>
+          <button
+            type="button"
+            className="chip chip-focus"
+            style={{ background: mine.hex }}
+            title="Zoom to your mood on the map"
+            onClick={flyToMyMood}
+          >
+            {/* {myMood.alias ? `${myMood.alias} · ` : ''} */}
 
-            {myMood.alias ? `${myMood.alias} · ` : ''}
+            <MoodIcon mood={myMood.mood} size={16} className="chip-icon" />
 
-            {mine.emoji} {mine.label}
+            {mine.label}
 
-          </span>
+          </button>
 
         </div>
 
@@ -533,8 +605,8 @@ function getTooltip({ object }: { object?: HexBin | StripeFacet | null }) {
   const meta = MOOD_BY_ID[bin.dominantMood];
   const soleLabel =
     bin.total === 1 && bin.moodAlias
-      ? `<strong>${escapeHtml(bin.moodAlias)}</strong> · ${meta.emoji} ${meta.label}`
-      : `<strong>${meta.emoji} ${meta.label}</strong> leads here`;
+      ? `<strong>${escapeHtml(bin.moodAlias)}</strong> · ${moodIconHtml(bin.dominantMood)} ${meta.label}`
+      : `<strong>${moodIconHtml(bin.dominantMood)} ${meta.label}</strong> leads here`;
 
   const breakdown = (Object.keys(bin.counts) as (keyof typeof bin.counts)[])
 
@@ -552,7 +624,7 @@ function getTooltip({ object }: { object?: HexBin | StripeFacet | null }) {
 
           : '';
 
-      return `${MOOD_BY_ID[m].emoji} ${MOOD_BY_ID[m].label}: ${bin.counts[m]}${row}`;
+      return `${moodIconHtml(m)} ${MOOD_BY_ID[m].label}: ${bin.counts[m]}${row}`;
 
     })
 

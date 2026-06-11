@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { MOODS } from '../moods';
 import type { Mood, MyMood } from '../types';
+import MoodIcon from './MoodIcon';
 import { getCurrentLocation } from '../lib/geo';
 import { submitMood } from '../api';
 
@@ -43,21 +44,25 @@ export default function MoodPicker({ userId, current, onSaved, onCancel }: Props
       <h1>How are you feeling?</h1>
       <p className="subtitle">
         Pick one of the five core emotions. Your mood joins a live heatmap of how the
-        world feels right now, and stays yours for the next 12 hours.
+        world feels right now, and stays yours for the next 24 hours.
       </p>
-
+      
       <label className="alias-field">
-        <span className="alias-label">Name or alias (optional)</span>
-        <input
-          type="text"
-          className="alias-input"
-          value={alias}
-          maxLength={ALIAS_MAX}
-          placeholder="e.g. Alex, NightOwl…"
-          disabled={pending !== null}
-          onChange={(e) => setAlias(e.target.value)}
-        />
-        <span className="alias-hint">Shown on the map when your hex is alone. Max {ALIAS_MAX} chars.</span>
+        <div className="alias-row">
+          <span className="alias-label">Name or alias (optional)</span>
+          <input
+            type="text"
+            className="alias-input"
+            value={alias}
+            maxLength={ALIAS_MAX}
+            placeholder="e.g. Alex, NightOwl…"
+            disabled={pending !== null}
+            onChange={(e) => setAlias(e.target.value)}
+          />
+        </div>
+        {/* <span className="alias-hint">
+          Shown on the map when your hex is alone. Max {ALIAS_MAX} chars.
+        </span> */}
       </label>
 
       <div className="mood-grid">
@@ -69,7 +74,7 @@ export default function MoodPicker({ userId, current, onSaved, onCancel }: Props
             disabled={pending !== null}
             onClick={() => choose(m.id)}
           >
-            <span className="emoji">{m.emoji}</span>
+            <MoodIcon mood={m.id} size={40} className="mood-card-icon" />
             <span className="name" style={{ color: m.hex }}>
               {m.label}
             </span>

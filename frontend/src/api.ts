@@ -1,8 +1,20 @@
 import type { Mood, MoodPoint, MyMood } from './types';
 
-const API_BASE: string =
-  (import.meta.env.VITE_API_BASE as string | undefined)?.replace(/\/$/, '') ??
-  'http://localhost:8000/api';
+function resolveApiBase(): string {
+  const fromEnv = (import.meta.env.VITE_API_BASE as string | undefined)?.replace(/\/$/, '');
+
+  if (import.meta.env.PROD) {
+    // Never call localhost from a production build (guards against stale .env on deploy).
+    if (fromEnv && !/^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?/i.test(fromEnv)) {
+      return fromEnv;
+    }
+    return 'https://tonicturtle.com/moodorama/api';
+  }
+
+  return fromEnv || 'http://localhost:8000/api';
+}
+
+const API_BASE: string = resolveApiBase();
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const res = await fetch(`${API_BASE}${path}`, {

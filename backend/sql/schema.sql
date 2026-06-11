@@ -1,7 +1,7 @@
 -- Moodorama database schema (MySQL 5.7+ / 8.0+)
 --
 -- One row per user. A user's mood selection is upserted, and is considered
--- "active" for 12 hours (expires_at). The map only shows active moods.
+-- "active" for 24 hours (expires_at). The map only shows active moods.
 
 CREATE DATABASE IF NOT EXISTS moodorama
   CHARACTER SET utf8mb4

@@ -18,8 +18,13 @@ return [
     ],
 
     // How long a mood selection stays "active" / visible on the map.
-    'mood_ttl_hours' => 12,
+    'mood_ttl_hours' => 24,
 
     // Allowed origins for CORS. Use ['*'] to allow any (dev only).
-    'cors_allowed_origins' => ['http://localhost:5173', 'http://127.0.0.1:5173'],
+    // Override at deploy time with CORS_ALLOWED_ORIGINS=https://tonicturtle.com,http://localhost:5173
+    'cors_allowed_origins' => [
+        'http://localhost:5173',
+        'http://127.0.0.1:5173',
+        'https://tonicturtle.com',
+    ],
 ];

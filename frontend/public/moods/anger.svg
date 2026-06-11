@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Anger">
+  <circle cx="32" cy="34" r="26" fill="#e84c4c"/>
+  <path d="M16 22 L26 28" stroke="#6e1e1e" stroke-width="4" stroke-linecap="round"/>
+  <path d="M48 22 L38 28" stroke="#6e1e1e" stroke-width="4" stroke-linecap="round"/>
+  <circle cx="23" cy="32" r="3.5" fill="#6e1e1e"/>
+  <circle cx="41" cy="32" r="3.5" fill="#6e1e1e"/>
+  <path d="M22 46 L30 42 L38 46 L46 42" fill="none" stroke="#6e1e1e" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

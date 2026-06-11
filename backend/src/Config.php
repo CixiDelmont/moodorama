@@ -25,6 +25,13 @@ final class Config
 
     public static function get(string $key, mixed $default = null): mixed
     {
+        if ($key === 'cors_allowed_origins') {
+            $env = getenv('CORS_ALLOWED_ORIGINS');
+            if (is_string($env) && $env !== '') {
+                return array_values(array_filter(array_map('trim', explode(',', $env))));
+            }
+        }
+
         return self::all()[$key] ?? $default;
     }
 }

@@ -62,22 +62,32 @@ button {
 
 .alias-field {
   margin-top: 28px;
-  width: min(420px, 100%);
+  width: min(520px, 100%);
   display: flex;
   flex-direction: column;
-  align-items: stretch;
+  align-items: center;
   gap: 6px;
-  text-align: left;
+  text-align: center;
+}
+
+.alias-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 10px 12px;
+  width: 100%;
 }
 
 .alias-label {
   font-size: 13px;
   font-weight: 600;
   color: var(--text);
+  white-space: nowrap;
 }
 
 .alias-input {
-  width: 100%;
+  width: min(220px, 100%);
   box-sizing: border-box;
   padding: 10px 12px;
   border-radius: 10px;
@@ -131,9 +141,32 @@ button {
   cursor: progress;
 }
 
-.mood-card .emoji {
-  font-size: 40px;
-  line-height: 1;
+.mood-icon {
+  display: block;
+  object-fit: contain;
+}
+
+.mood-card-icon {
+  width: 40px;
+  height: 40px;
+}
+
+.legend-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.legend-icon {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+.chip-icon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
 }
 
 .mood-card .name {
@@ -222,10 +255,25 @@ button {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 4px 10px;
+  padding: 4px 10px 4px 8px;
   border-radius: 999px;
   color: #08101f;
-  font-weight: 700;
+  font-weight: 500;
+}
+
+.your-mood .chip-focus {
+  border: none;
+  cursor: pointer;
+  font: inherit;
+  transition: filter 0.12s ease, transform 0.12s ease;
+}
+
+.your-mood .chip-focus:hover {
+  filter: brightness(1.08);
+}
+
+.your-mood .chip-focus:active {
+  transform: scale(0.98);
 }
 
 .btn {

@@ -4,7 +4,7 @@ A live **heatmap of the world's moods**, inspired by the five core emotions from
 *Inside Out*: **Joy, Sadness, Fear, Disgust, and Anger**.
 
 Anyone can drop their current mood onto the map. Each mood is pinned to the user's
-location, stays active for **12 hours**, and is rendered as part of a hexagonal
+location, stays active for **24 hours**, and is rendered as part of a hexagonal
 heatmap. Each hexagon shows the **most-represented mood** in its area. Hexagons keep
 a constant on-screen size — zooming in or out simply changes how much land (and how
 many moods) each hexagon aggregates, powered by [Uber's H3](https://h3geo.org/) grid.
@@ -28,7 +28,7 @@ many moods) each hexagon aggregates, powered by [Uber's H3](https://h3geo.org/) 
 2. The user picks one of the five moods. The browser asks for the user's location and
    sends `{ userId, mood, latitude, longitude }` to the API.
 3. The API **upserts** one row per user (`UNIQUE(user_id)`) and sets `expires_at` to
-   `now + 12h`. Re-selecting a mood updates that same row and resets the 12h window.
+   `now + 24h`. Re-selecting a mood updates that same row and resets the 24h window.
 4. The map fetches every **active** mood (`expires_at > NOW()`), bins the points into
    H3 cells at a resolution chosen from the current zoom, and colours each hexagon by
    the dominant mood. A flat **Map** view and a 3D **Globe** view are both available.

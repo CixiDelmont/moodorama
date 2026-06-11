@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Fear">
+  <circle cx="32" cy="34" r="26" fill="#a06cd5"/>
+  <circle cx="23" cy="28" r="5" fill="#f5f0ff"/>
+  <circle cx="41" cy="28" r="5" fill="#f5f0ff"/>
+  <circle cx="23" cy="28" r="2.5" fill="#4a2d6e"/>
+  <circle cx="41" cy="28" r="2.5" fill="#4a2d6e"/>
+  <ellipse cx="32" cy="46" rx="8" ry="6" fill="#4a2d6e"/>
+</svg>
