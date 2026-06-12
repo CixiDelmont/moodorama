@@ -217,7 +217,9 @@ export default function MoodMap({ myMood, onChangeMood }: Props) {
 
   }, [load]);
 
-
+  useEffect(() => {
+    console.log('zoom:', viewState.zoom);
+  }, [viewState.zoom]);
 
   const deferredViewState = useDeferredValue(viewState);
   const cullViewState = viewMode === 'map' ? deferredViewState : viewState;

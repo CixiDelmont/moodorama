@@ -7,6 +7,23 @@ function lerp(a: number, b: number, t: number): number {
   return a + (b - a) * t;
 }
 
+/**
+ * Diagonal stripe polygons are clipped in a flat plane then draped on the map.
+ * That breaks for cells with a wide longitude span (antimeridian / polar H3
+ * distortion) or high latitude — a handful of mixed hexes can paint artifacts
+ * across the whole viewport. Those render as solid dominant-mood hexes instead.
+ */
+export function canRenderStripes(hex: string): boolean {
+  const ring = cellToBoundary(hex, true) as LngLat[];
+  if (ring.length < 3) return false;
+
+  const lngs = ring.map(([lng]) => lng);
+  const lats = ring.map(([, lat]) => lat);
+  if (Math.max(...lngs) - Math.min(...lngs) > 100) return false;
+  if (Math.max(...lats.map((lat) => Math.abs(lat))) > 70) return false;
+  return true;
+}
+
 /** H3 cell ring as [lng, lat] with optional coverage shrink (matches H3HexagonLayer). */
 export function hexPolygon(hex: string, coverage = 0.95): LngLat[] {
   const ring = cellToBoundary(hex, true) as LngLat[];

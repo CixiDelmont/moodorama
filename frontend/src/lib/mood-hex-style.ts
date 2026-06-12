@@ -1,5 +1,6 @@
 import { MOOD_BY_ID } from '../moods';
 import type { HexBin } from './h3';
+import { canRenderStripes } from './hex-polygon';
 import { binNeedsStripes } from './stripe-patterns';
 
 export function partitionBins(bins: HexBin[]): { solidBins: HexBin[]; stripeBins: HexBin[] } {
@@ -7,7 +8,7 @@ export function partitionBins(bins: HexBin[]): { solidBins: HexBin[]; stripeBins
   const stripeBins: HexBin[] = [];
 
   for (const bin of bins) {
-    if (binNeedsStripes(bin.counts, bin.total)) {
+    if (binNeedsStripes(bin.counts, bin.total) && canRenderStripes(bin.hex)) {
       stripeBins.push(bin);
     } else {
       solidBins.push(bin);

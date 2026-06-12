@@ -25,20 +25,36 @@ export interface HexBin {
  */
 export function resolutionForZoom(zoom: number): number {
   const table: Array<[number, number]> = [
-    [1.5, 1],
-    [3, 2],
-    [4.5, 3],
-    [6, 4],
-    [7.5, 5],
-    [9, 6],
-    [10.5, 7],
-    [12, 8],
-    [13.5, 9],
+    [14, 11],
+    [13.5, 11],
+    [13, 10],
+    [12, 10],
+    [11, 9],
+    [10, 8],
+    [9.5, 7],
+    [9, 7],
+    [8.5, 7],
+    [8, 6],
+    [7.5, 6],
+    [7, 6],
+    [6.5, 6],
+    [6, 5],
+    [5.5, 5],
+    [5, 5],
+    [4.5, 4],
+    [4, 4],
+    [3.5, 3],
+    [3, 3],
+    [2.5, 2],
+    [2.1, 3],
+    [1.5, 2],
+    [1, 2],
+    [0.5, 2]
   ];
   for (const [maxZoom, res] of table) {
-    if (zoom < maxZoom) return res;
+    if (zoom >= maxZoom) return res;
   }
-  return 10;
+  return 2;
 }
 
 const EMPTY_COUNTS = (): Record<Mood, number> => ({
