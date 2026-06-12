@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { MOODS } from '../moods';
+import { useState, type CSSProperties } from 'react';
+import { MOODS, MOOD_BY_ID } from '../moods';
 import type { Mood, MyMood } from '../types';
 import MoodIcon from './MoodIcon';
 import { getCurrentLocation } from '../lib/geo';
@@ -82,11 +82,29 @@ export default function MoodPicker({ userId, current, onSaved, onCancel }: Props
         ))}
       </div>
 
-      {pending && <p className="hint">Finding your location…</p>}
       {!pending && (
         <p className="hint">
           We use your location only to place a single hexagon on the map.
         </p>
+      )}
+
+      {pending && (
+        <div
+          className="picker-loading"
+          role="status"
+          aria-live="polite"
+          aria-busy="true"
+          style={{ '--spinner-color': MOOD_BY_ID[pending].hex } as CSSProperties}
+        >
+          <div className="picker-loading-content">
+            <div className="picker-loading-visual">
+              <div className="picker-loading-spinner" aria-hidden />
+              <MoodIcon mood={pending} size={48} className="picker-loading-icon" />
+            </div>
+            <p>Finding your location…</p>
+            <p className="picker-loading-sub">Placing you on the map</p>
+          </div>
+        </div>
       )}
 
       {error && <div className="error">{error}</div>}
