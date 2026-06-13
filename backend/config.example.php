@@ -17,8 +17,8 @@ return [
         'charset'  => 'utf8mb4',
     ],
 
-    // How long a mood selection stays "active" / visible on the map.
-    'mood_ttl_hours' => 24,
+    // How long a mood selection stays "active" / visible on the map.  168 hours = 7 days
+    'mood_ttl_hours' => 168,
 
     // Allowed origins for CORS. Use ['*'] to allow any (dev only).
     // Override at deploy time with CORS_ALLOWED_ORIGINS=https://tonicturtle.com,http://localhost:5173

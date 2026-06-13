@@ -38,7 +38,7 @@ final class MoodRepository
 
      * Insert a new mood for the user, or update the existing one.
 
-     * Resets the 24h (configurable) expiry window each time.
+     * Resets the 7d (configurable) expiry window each time.
 
      */
 
@@ -46,7 +46,7 @@ final class MoodRepository
 
     {
 
-        $ttl = (int) Config::get('mood_ttl_hours', 24);
+        $ttl = (int) Config::get('mood_ttl_hours', 168); // 168 hours = 7 days
 
         $now = new \DateTimeImmutable('now');
 

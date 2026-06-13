@@ -318,9 +318,26 @@ button {
 .overlay.top-right {
   top: 16px;
   right: 16px;
+}
+
+.map-toolbar {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.map-toolbar-controls {
   display: flex;
   gap: 8px;
   align-items: center;
+}
+
+.mood-count {
+  margin: 0;
+  font-size: 12px;
+  color: var(--muted);
+  white-space: nowrap;
 }
 
 .overlay.bottom-left {
@@ -424,7 +441,7 @@ button {
   flex-shrink: 0;
 }
 
-.overlay.top-right > .btn {
+.map-toolbar-controls > .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -524,19 +541,23 @@ button {
     padding: 8px;
   }
 
-  .overlay.top-right .btn-icon {
+  .map-toolbar-controls .btn-icon {
     display: block;
   }
 
-  .overlay.top-right .btn-label {
+  .map-toolbar-controls .btn-label {
     display: none;
   }
 
-  .overlay.top-right .toggle button,
-  .overlay.top-right > .btn {
+  .map-toolbar-controls .toggle button,
+  .map-toolbar-controls > .btn {
     padding: 8px;
     min-width: 36px;
     min-height: 36px;
+  }
+
+  .mood-count {
+    display: none;
   }
 
   .overlay.bottom-left {

@@ -44,7 +44,7 @@ export default function MoodPicker({ userId, current, onSaved, onCancel }: Props
       <h1>How are you feeling?</h1>
       <p className="subtitle">
         Pick one of the five core emotions. Your mood joins a live heatmap of how the
-        world feels right now, and stays yours for the next 24 hours.
+        world feels right now, and stays yours for the next 7 days.
       </p>
       
       <label className="alias-field">

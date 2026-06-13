@@ -15,46 +15,20 @@ export interface HexBin {
   moodAlias?: string;
 }
 
+const H3_MIN_RES = 2;
+const H3_MAX_RES = 11;
+/** Extra map zoom before stepping up one H3 resolution (keeps on-screen hex size stable). */
+const ZOOM_PER_H3_RES = 1.5;
+
 /**
  * Maps a map zoom level to an H3 resolution. Because deck.gl draws hexagons at
  * their true geographic size, increasing the resolution as the user zooms in
  * keeps the *on-screen* hexagon size roughly constant — each step just changes
  * how much land (and how many moods) a hexagon aggregates.
- *
- * Roughly one extra H3 resolution per ~1.5 zoom levels.
  */
 export function resolutionForZoom(zoom: number): number {
-  const table: Array<[number, number]> = [
-    [14, 11],
-    [13.5, 11],
-    [13, 10],
-    [12, 10],
-    [11, 9],
-    [10, 8],
-    [9.5, 7],
-    [9, 7],
-    [8.5, 7],
-    [8, 6],
-    [7.5, 6],
-    [7, 6],
-    [6.5, 6],
-    [6, 5],
-    [5.5, 5],
-    [5, 5],
-    [4.5, 4],
-    [4, 4],
-    [3.5, 3],
-    [3, 3],
-    [2.5, 2],
-    [2.1, 3],
-    [1.5, 2],
-    [1, 2],
-    [0.5, 2]
-  ];
-  for (const [maxZoom, res] of table) {
-    if (zoom >= maxZoom) return res;
-  }
-  return 2;
+  const res = Math.round(H3_MIN_RES + zoom / ZOOM_PER_H3_RES -1);
+  return Math.min(H3_MAX_RES, Math.max(H3_MIN_RES, res));
 }
 
 const EMPTY_COUNTS = (): Record<Mood, number> => ({

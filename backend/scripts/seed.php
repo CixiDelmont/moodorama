@@ -7,7 +7,7 @@
  *
  *   php backend/scripts/seed.php [count]
  *
- * Default count is 800. Seeded rows expire like normal moods (24h).
+ * Default count is 800. Seeded rows expire like normal moods (7d).
  *
  * Regenerate the land mask with:
  *   php backend/scripts/generate_land_mask.php

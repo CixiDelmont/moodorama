@@ -440,6 +440,10 @@ export default function MoodMap({ myMood, onChangeMood }: Props) {
   }, []);
 
   const flyToMyMood = useCallback(() => {
+    if (viewMode === 'globe') {
+      setViewMode('map');
+    }
+
     setViewState((prev) =>
       normalizeViewState(
         {
@@ -450,7 +454,7 @@ export default function MoodMap({ myMood, onChangeMood }: Props) {
           transitionDuration: 1200,
           transitionInterpolator: new FlyToInterpolator(),
         },
-        viewMode,
+        'map',
       ),
     );
   }, [myMood.latitude, myMood.longitude, viewMode]);
@@ -540,36 +544,50 @@ export default function MoodMap({ myMood, onChangeMood }: Props) {
 
       <div className="overlay top-right">
 
-        <div className="toggle">
+        <div className="map-toolbar">
 
-          <button
-            type="button"
-            className={viewMode === 'map' ? 'active' : ''}
-            onClick={() => switchViewMode('map')}
-            aria-label="Map view"
-            title="Map"
-          >
-            <MapViewIcon />
-            <span className="btn-label">Map</span>
-          </button>
+          <div className="map-toolbar-controls">
 
-          <button
-            type="button"
-            className={viewMode === 'globe' ? 'active' : ''}
-            onClick={() => switchViewMode('globe')}
-            aria-label="Globe view"
-            title="Globe"
-          >
-            <GlobeViewIcon />
-            <span className="btn-label">Globe</span>
-          </button>
+            <div className="toggle">
+
+              <button
+                type="button"
+                className={viewMode === 'map' ? 'active' : ''}
+                onClick={() => switchViewMode('map')}
+                aria-label="Map view"
+                title="Map"
+              >
+                <MapViewIcon />
+                <span className="btn-label">Map</span>
+              </button>
+
+              <button
+                type="button"
+                className={viewMode === 'globe' ? 'active' : ''}
+                onClick={() => switchViewMode('globe')}
+                aria-label="Globe view"
+                title="Globe"
+              >
+                <GlobeViewIcon />
+                <span className="btn-label">Globe</span>
+              </button>
+
+            </div>
+
+            <button type="button" className="btn" onClick={load} aria-label="Refresh moods" title="Refresh">
+              <RefreshIcon />
+              <span className="btn-label">Refresh</span>
+            </button>
+
+          </div>
+
+          {!loading && (
+            <p className="mood-count">
+              {points.length.toLocaleString()} active mood{points.length === 1 ? '' : 's'}
+            </p>
+          )}
 
         </div>
-
-        <button type="button" className="btn" onClick={load} aria-label="Refresh moods" title="Refresh">
-          <RefreshIcon />
-          <span className="btn-label">Refresh</span>
-        </button>
 
       </div>
 
