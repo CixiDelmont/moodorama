@@ -1,4 +1,4 @@
-import type { Mood, MoodPoint, MyMood } from './types';
+import type { Mood, MoodPoint, MyMood, SnapshotCountryCount, SnapshotMeta } from './types';
 
 function resolveApiBase(): string {
   const fromEnv = (import.meta.env.VITE_API_BASE as string | undefined)?.replace(/\/$/, '');
@@ -85,4 +85,14 @@ export function unsubscribePush(userId: string, endpoint: string): Promise<{ ok:
     method: 'POST',
     body: JSON.stringify({ userId, endpoint }),
   });
+}
+
+export function fetchSnapshots(limit = 168): Promise<SnapshotMeta[]> {
+  return request<SnapshotMeta[]>(`/snapshots?limit=${limit}`);
+}
+
+export function fetchSnapshotCountries(at: string): Promise<SnapshotCountryCount[]> {
+  return request<SnapshotCountryCount[]>(
+    `/snapshots/countries?at=${encodeURIComponent(at)}`,
+  );
 }

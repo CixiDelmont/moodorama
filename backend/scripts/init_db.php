@@ -75,4 +75,38 @@ $pdo->exec(
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
 );
 
+$pdo->exec(
+    "CREATE TABLE IF NOT EXISTS mood_snapshots (
+        snapshot_at  DATETIME        NOT NULL,
+        point_count  INT UNSIGNED    NOT NULL,
+        captured_at  DATETIME        NOT NULL,
+        PRIMARY KEY (snapshot_at)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
+);
+
+$pdo->exec(
+    "CREATE TABLE IF NOT EXISTS mood_snapshot_points (
+        id            BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        snapshot_at   DATETIME        NOT NULL,
+        mood          ENUM('joy', 'fear', 'sadness', 'disgust', 'anger') NOT NULL,
+        latitude      DOUBLE          NOT NULL,
+        longitude     DOUBLE          NOT NULL,
+        country_code  CHAR(2)         NULL,
+        PRIMARY KEY (id),
+        KEY idx_snapshot (snapshot_at),
+        KEY idx_snapshot_country (snapshot_at, country_code),
+        KEY idx_snapshot_mood (snapshot_at, mood)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
+);
+
+$pdo->exec(
+    "CREATE TABLE IF NOT EXISTS mood_snapshot_country_counts (
+        snapshot_at   DATETIME NOT NULL,
+        country_code  CHAR(2)  NOT NULL,
+        mood          ENUM('joy', 'fear', 'sadness', 'disgust', 'anger') NOT NULL,
+        count         INT UNSIGNED NOT NULL,
+        PRIMARY KEY (snapshot_at, country_code, mood)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
+);
+
 echo "Database '$name' and tables are ready.\n";

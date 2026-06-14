@@ -149,6 +149,32 @@ final class MoodRepository
 
 
     /**
+     * Active mood coordinates for historical snapshots (no user identifiers or dates).
+     *
+     * @return list<array{mood: string, latitude: float, longitude: float}>
+     */
+    public function activeMoodCoordinates(bool $excludeSeed = true): array
+    {
+        $sql = 'SELECT mood, latitude, longitude
+                FROM moods
+                WHERE expires_at > NOW()';
+
+        if ($excludeSeed) {
+            $sql .= " AND user_id NOT LIKE 'seed-%'";
+        }
+
+        $rows = $this->pdo->query($sql)->fetchAll();
+
+        return array_map(static fn (array $r): array => [
+            'mood'      => (string) $r['mood'],
+            'latitude'  => (float) $r['latitude'],
+            'longitude' => (float) $r['longitude'],
+        ], $rows);
+    }
+
+
+
+    /**
 
      * Active moods expiring within the reminder window that have push subscriptions
 

@@ -20,6 +20,9 @@ return [
     // How long a mood selection stays "active" / visible on the map.  168 hours = 7 days
     'mood_ttl_hours' => 168,
 
+    // Hourly mood snapshots (php backend/scripts/snapshot_moods.php)
+    'snapshot_exclude_seed' => true,
+
     // Web Push (generate keys with: php backend/scripts/generate_vapid_keys.php)
     'vapid_public_key'  => 'BPOzlk_b4xSHUngAO0paFrdFW7KGAv-qBd9dd_Q1v8F8R5s1k_DkFjF5yFJhXLj4wtdTG8n5cGIlCtZIfQ28KaA',
     'vapid_private_key' => 'JTkNsn0vzshYToIB5hHAb6q3_UEii-bmNnF5gCN45Ko',

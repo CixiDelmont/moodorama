@@ -5,8 +5,9 @@ import { syncPushSubscription } from './lib/push';
 import type { MyMood } from './types';
 import MoodPicker from './components/MoodPicker';
 import MoodMap from './components/MoodMap';
+import MoodStats from './components/MoodStats';
 
-type Screen = 'loading' | 'picker' | 'map';
+type Screen = 'loading' | 'picker' | 'map' | 'stats';
 
 export default function App() {
   const [userId] = useState(getUserId);
@@ -44,7 +45,17 @@ export default function App() {
   }
 
   if (screen === 'map' && myMood) {
-    return <MoodMap myMood={myMood} onChangeMood={() => setScreen('picker')} />;
+    return (
+      <MoodMap
+        myMood={myMood}
+        onChangeMood={() => setScreen('picker')}
+        onOpenStats={() => setScreen('stats')}
+      />
+    );
+  }
+
+  if (screen === 'stats') {
+    return <MoodStats onBack={() => setScreen('map')} />;
   }
 
   return (

@@ -17,3 +17,17 @@ export interface MyMood extends MoodPoint {
   userId: string;
   active: boolean;
 }
+
+/** Hourly snapshot metadata from GET /api/snapshots. */
+export interface SnapshotMeta {
+  snapshotAt: string;
+  pointCount: number;
+  capturedAt: string;
+}
+
+/** Per-country mood count from GET /api/snapshots/countries. */
+export interface SnapshotCountryCount {
+  countryCode: string;
+  mood: Mood;
+  count: number;
+}

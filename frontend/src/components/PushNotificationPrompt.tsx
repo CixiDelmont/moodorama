@@ -86,7 +86,7 @@ export default function PushNotificationPrompt({ userId, className }: Props) {
       ) : (
         <>
           <button type="button" className="btn push-prompt-btn" disabled={busy} onClick={() => void handleEnable()}>
-            Notify me before it expires
+            Notify me before expiry
           </button>
           {/* <p className="push-prompt-hint">Works even when this tab is closed.</p> */}
         </>

@@ -118,11 +118,13 @@ interface Props {
 
   onChangeMood: () => void;
 
+  onOpenStats: () => void;
+
 }
 
 
 
-export default function MoodMap({ myMood, onChangeMood }: Props) {
+export default function MoodMap({ myMood, onChangeMood, onOpenStats }: Props) {
 
   const [viewMode, setViewMode] = useState<ViewMode>('map');
 
@@ -585,23 +587,44 @@ export default function MoodMap({ myMood, onChangeMood }: Props) {
 
             </div>
 
-            <button
-              type="button"
-              className="btn"
-              onClick={(e) => void load(e.ctrlKey)}
-              aria-label="Refresh moods"
-              title="Refresh"
-            >
-              <RefreshIcon />
-              <span className="btn-label">Refresh</span>
-            </button>
+            <div className="map-toolbar-actions">
+              <button
+                type="button"
+                className="btn"
+                onClick={(e) => void load(e.ctrlKey)}
+                aria-label="Refresh moods"
+                title="Refresh"
+              >
+                <RefreshIcon />
+                <span className="btn-label">Refresh</span>
+              </button>
+
+              <button
+                type="button"
+                className="btn map-toolbar-stats-btn"
+                onClick={onOpenStats}
+                aria-label="View mood stats"
+                title="Stats"
+              >
+                <StatsIcon />
+              </button>
+            </div>
 
           </div>
 
           {!loading && (
-            <p className="mood-count">
-              {points.length.toLocaleString()} active mood{points.length === 1 ? '' : 's'}
-            </p>
+            <div className="map-toolbar-footer">
+              <button
+                type="button"
+                className="map-toolbar-link"
+                onClick={onOpenStats}
+              >
+                Stats
+              </button>
+              <p className="mood-count">
+                {points.length.toLocaleString()} active mood{points.length === 1 ? '' : 's'}
+              </p>
+            </div>
           )}
 
         </div>
@@ -650,6 +673,16 @@ function RefreshIcon() {
   );
 }
 
+function StatsIcon() {
+  return (
+    <svg className="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+      <line x1="18" y1="20" x2="18" y2="10" />
+      <line x1="12" y1="20" x2="12" y2="4" />
+      <line x1="6" y1="20" x2="6" y2="14" />
+    </svg>
+  );
+}
+
 function escapeHtml(text: string): string {
   return text
     .replace(/&/g, '&amp;')
@@ -658,10 +691,15 @@ function escapeHtml(text: string): string {
     .replace(/"/g, '&quot;');
 }
 
-function moodLineHtml(mood: Mood, alias?: string, strong = false): string {
+function moodIdentityPart(alias?: string, rowId?: number): string {
+  if (alias) return ` (${escapeHtml(alias)})`;
+//   if (rowId !== undefined) return ` (#${rowId})`;
+  return '';
+}
+
+function moodLineHtml(mood: Mood, alias?: string, strong = false, rowId?: number): string {
   const label = MOOD_BY_ID[mood].label;
-  const aliasPart = alias ? ` (${escapeHtml(alias)})` : '';
-  const text = `${moodIconHtml(mood)} ${label}${aliasPart}`;
+  const text = `${moodIconHtml(mood)} ${label}${moodIdentityPart(alias, rowId)}`;
   return strong ? `<strong>${text}</strong>` : text;
 }
 
@@ -676,8 +714,8 @@ function getTooltip({ object }: { object?: HexBin | StripeFacet | null }) {
   const meta = MOOD_BY_ID[bin.dominantMood];
   const soleAlias = bin.total === 1 ? bin.aliasesByMood?.[bin.dominantMood] ?? bin.moodAlias : undefined;
   const soleLabel =
-    bin.total === 1 && soleAlias
-      ? moodLineHtml(bin.dominantMood, soleAlias, true)
+    bin.total === 1
+      ? moodLineHtml(bin.dominantMood, soleAlias, true, bin.moodRowId)
       : `<strong>${moodIconHtml(bin.dominantMood)} ${meta.label}</strong> leads here`;
 
   const breakdown = (Object.keys(bin.counts) as (keyof typeof bin.counts)[])
@@ -689,8 +727,8 @@ function getTooltip({ object }: { object?: HexBin | StripeFacet | null }) {
     .map((m) => {
       const count = bin.counts[m];
       const alias = count === 1 ? bin.aliasesByMood?.[m] : undefined;
-      const aliasPart = alias ? ` (${escapeHtml(alias)})` : '';
-      return `${moodIconHtml(m)} ${MOOD_BY_ID[m].label}: ${count}${aliasPart}`;
+      const rowId = count === 1 ? bin.idsByMood?.[m] : undefined;
+      return `${moodIconHtml(m)} ${MOOD_BY_ID[m].label}: ${count}${moodIdentityPart(alias, rowId)}`;
     })
 
     .join('<br/>');
