@@ -34,7 +34,7 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 
 
 
-import type { MoodPoint, MyMood } from '../types';
+import type { Mood, MoodPoint, MyMood } from '../types';
 
 import { MOOD_BY_ID, moodIconHtml } from '../moods';
 import MoodIcon from './MoodIcon';
@@ -56,6 +56,7 @@ import { partitionBins, solidFillColor } from '../lib/mood-hex-style';
 import { buildStripeFacets } from '../lib/stripe-patterns';
 
 import Legend from './Legend';
+import MoodExpiryReminder, { useMoodExpiryReminderVisible } from './MoodExpiryReminder';
 
 
 
@@ -460,6 +461,7 @@ export default function MoodMap({ myMood, onChangeMood }: Props) {
   }, [myMood.latitude, myMood.longitude, viewMode]);
 
   const mine = MOOD_BY_ID[myMood.mood];
+  const showExpiryReminder = useMoodExpiryReminderVisible(myMood.expiresAt);
 
 
 
@@ -530,11 +532,17 @@ export default function MoodMap({ myMood, onChangeMood }: Props) {
 
         </div>
 
-        <button className="btn primary" style={{ marginTop: 12 }} onClick={onChangeMood}>
+        {!showExpiryReminder && (
+          <button className="btn primary" style={{ marginTop: 12 }} onClick={onChangeMood}>
+            Change my mood
+          </button>
+        )}
 
-          Change my mood
-
-        </button>
+        <MoodExpiryReminder
+          expiresAt={myMood.expiresAt}
+          onRenew={onChangeMood}
+          renewLabel="Change my mood"
+        />
 
         {error && <div className="error" style={{ marginTop: 12 }}>{error}</div>}
 
@@ -647,6 +655,13 @@ function escapeHtml(text: string): string {
     .replace(/"/g, '&quot;');
 }
 
+function moodLineHtml(mood: Mood, alias?: string, strong = false): string {
+  const label = MOOD_BY_ID[mood].label;
+  const aliasPart = alias ? ` (${escapeHtml(alias)})` : '';
+  const text = `${moodIconHtml(mood)} ${label}${aliasPart}`;
+  return strong ? `<strong>${text}</strong>` : text;
+}
+
 function getTooltip({ object }: { object?: HexBin | StripeFacet | null }) {
 
   const bin = object && 'hexBin' in object ? object.hexBin : object;
@@ -656,9 +671,10 @@ function getTooltip({ object }: { object?: HexBin | StripeFacet | null }) {
 
 
   const meta = MOOD_BY_ID[bin.dominantMood];
+  const soleAlias = bin.total === 1 ? bin.aliasesByMood?.[bin.dominantMood] ?? bin.moodAlias : undefined;
   const soleLabel =
-    bin.total === 1 && bin.moodAlias
-      ? `<strong>${escapeHtml(bin.moodAlias)}</strong> · ${moodIconHtml(bin.dominantMood)} ${meta.label}`
+    bin.total === 1 && soleAlias
+      ? moodLineHtml(bin.dominantMood, soleAlias, true)
       : `<strong>${moodIconHtml(bin.dominantMood)} ${meta.label}</strong> leads here`;
 
   const breakdown = (Object.keys(bin.counts) as (keyof typeof bin.counts)[])
@@ -668,17 +684,10 @@ function getTooltip({ object }: { object?: HexBin | StripeFacet | null }) {
     .sort((a, b) => bin.counts[b] - bin.counts[a])
 
     .map((m) => {
-
-      const row =
-
-        bin.total === 1 && bin.moodRowId != null && !bin.moodAlias
-
-          ? ` <span style="opacity:0.7">#${bin.moodRowId}</span>`
-
-          : '';
-
-      return `${moodIconHtml(m)} ${MOOD_BY_ID[m].label}: ${bin.counts[m]}${row}`;
-
+      const count = bin.counts[m];
+      const alias = count === 1 ? bin.aliasesByMood?.[m] : undefined;
+      const aliasPart = alias ? ` (${escapeHtml(alias)})` : '';
+      return `${moodIconHtml(m)} ${MOOD_BY_ID[m].label}: ${count}${aliasPart}`;
     })
 
     .join('<br/>');

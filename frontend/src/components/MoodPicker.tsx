@@ -2,6 +2,7 @@ import { useState, type CSSProperties } from 'react';
 import { MOODS, MOOD_BY_ID } from '../moods';
 import type { Mood, MyMood } from '../types';
 import MoodIcon from './MoodIcon';
+import MoodExpiryReminder from './MoodExpiryReminder';
 import { getCurrentLocation } from '../lib/geo';
 import { submitMood } from '../api';
 
@@ -46,6 +47,10 @@ export default function MoodPicker({ userId, current, onSaved, onCancel }: Props
         Pick one of the five core emotions. Your mood joins a live heatmap of how the
         world feels right now, and stays yours for the next 7 days.
       </p>
+
+      {current?.active && (
+        <MoodExpiryReminder expiresAt={current.expiresAt} className="picker-expiry-reminder" />
+      )}
       
       <label className="alias-field">
         <div className="alias-row">

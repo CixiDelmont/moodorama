@@ -13,6 +13,8 @@ export interface HexBin {
   moodRowId?: number;
   /** Display alias when exactly one mood point falls in this hex. */
   moodAlias?: string;
+  /** Alias per mood when that mood's count in this hex is exactly 1. */
+  aliasesByMood?: Partial<Record<Mood, string>>;
 }
 
 const H3_MIN_RES = 2;
@@ -45,7 +47,7 @@ const EMPTY_COUNTS = (): Record<Mood, number> => ({
  */
 interface BinAccumulator {
   counts: Record<Mood, number>;
-  entries: Array<{ id: number; alias?: string }>;
+  entries: Array<{ id: number; mood: Mood; alias?: string }>;
 }
 
 export function binMoods(points: MoodPoint[], resolution: number): HexBin[] {
@@ -60,7 +62,11 @@ export function binMoods(points: MoodPoint[], resolution: number): HexBin[] {
       bins.set(hex, bin);
     }
     bin.counts[p.mood] += 1;
-    bin.entries.push({ id: p.id, ...(p.alias ? { alias: p.alias } : {}) });
+    bin.entries.push({
+      id: p.id,
+      mood: p.mood,
+      ...(p.alias ? { alias: p.alias } : {}),
+    });
   }
 
   const result: HexBin[] = [];
@@ -77,11 +83,18 @@ export function binMoods(points: MoodPoint[], resolution: number): HexBin[] {
       }
     });
     const sole = total === 1 && entries.length === 1 ? entries[0] : null;
+    const aliasesByMood: Partial<Record<Mood, string>> = {};
+    for (const mood of Object.keys(counts) as Mood[]) {
+      if (counts[mood] !== 1) continue;
+      const entry = entries.find((e) => e.mood === mood);
+      if (entry?.alias) aliasesByMood[mood] = entry.alias;
+    }
     result.push({
       hex,
       dominantMood,
       total,
       counts,
+      ...(Object.keys(aliasesByMood).length > 0 ? { aliasesByMood } : {}),
       ...(sole
         ? {
             moodRowId: sole.id,

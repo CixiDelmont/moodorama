@@ -214,6 +214,36 @@ button {
   max-width: 520px;
 }
 
+.mood-expiry-reminder {
+  margin-top: 12px;
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: rgba(255, 196, 80, 0.12);
+  border: 1px solid rgba(255, 196, 80, 0.35);
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--text);
+}
+
+.mood-expiry-reminder p {
+  margin: 0;
+}
+
+.mood-expiry-reminder strong {
+  color: #ffd27a;
+}
+
+.mood-expiry-renew {
+  margin-top: 8px;
+  width: 100%;
+}
+
+.picker-expiry-reminder {
+  margin-top: 16px;
+  max-width: 520px;
+  text-align: center;
+}
+
 .picker-loading {
   position: fixed;
   inset: 0;
