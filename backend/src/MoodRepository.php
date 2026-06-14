@@ -290,6 +290,18 @@ final class MoodRepository
 
 
 
+    /** Absolute URL to the push notification icon for a mood. */
+    public static function pushIconUrl(string $mood, string $iconBaseUrl, string $extension = 'png'): string
+    {
+        if (!in_array($mood, self::MOODS, true)) {
+            $mood = 'joy';
+        }
+
+        return rtrim($iconBaseUrl, '/') . '/' . $mood . '.' . ltrim($extension, '.');
+    }
+
+
+
     public static function normalizeAlias(mixed $value): ?string
 
     {

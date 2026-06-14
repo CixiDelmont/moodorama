@@ -27,7 +27,9 @@ return [
     // Hours before expiry to send a push reminder (matches in-app reminder window).
     'push_reminder_hours' => 24,
     'push_app_url'  => getenv('PUSH_APP_URL') ?: 'https://tonicturtle.com/moodorama/',
-    'push_icon_url' => getenv('PUSH_ICON_URL') ?: 'https://tonicturtle.com/moodorama/moods/joy.svg',
+    // Base URL for mood icons, e.g. https://tonicturtle.com/moodorama/moods/
+    'push_icon_base_url' => getenv('PUSH_ICON_BASE_URL') ?: 'https://tonicturtle.com/moodorama/moods/',
+    'push_icon_extension' => getenv('PUSH_ICON_EXTENSION') ?: 'png',
 
     // Allowed origins for CORS. Use ['*'] to allow any (dev only).
     // Override at deploy time with CORS_ALLOWED_ORIGINS=https://tonicturtle.com,http://localhost:5173

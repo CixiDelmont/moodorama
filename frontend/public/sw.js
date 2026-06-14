@@ -1,6 +1,6 @@
 /// <reference lib="webworker" />
 
-const DEFAULT_ICON = 'moods/joy.svg';
+const DEFAULT_ICON = 'moods/joy.png';
 
 function resolveUrl(path) {
   const base = self.registration.scope.replace(/\/?$/, '/');
@@ -27,11 +27,15 @@ self.addEventListener('push', (event) => {
     }
   }
 
+  const iconPath =
+    data.icon ??
+    (data.mood && /^[a-z]+$/.test(data.mood) ? `moods/${data.mood}.png` : DEFAULT_ICON);
+
   event.waitUntil(
     self.registration.showNotification(data.title ?? 'Moodorama', {
       body: data.body,
-      icon: resolveUrl(data.icon ?? DEFAULT_ICON),
-      badge: resolveUrl(data.icon ?? DEFAULT_ICON),
+      icon: resolveUrl(iconPath),
+      badge: resolveUrl(iconPath),
       tag: data.tag ?? 'mood-expiry',
       data: { url: resolveUrl(data.url ?? '/') },
     }),

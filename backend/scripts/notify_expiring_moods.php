@@ -24,7 +24,12 @@ if (!WebPushSender::isConfigured()) {
 
 $reminderHours = (int) Config::get('push_reminder_hours', 24);
 $appUrl = rtrim((string) Config::get('push_app_url', 'https://tonicturtle.com/moodorama/'), '/') . '/';
-$iconUrl = rtrim((string) Config::get('push_icon_url', $appUrl . 'moods/joy.png'), '/');
+$iconBase = (string) Config::get('push_icon_base_url', '');
+if ($iconBase === '') {
+    $fallbackIcon = (string) Config::get('push_icon_url', $appUrl . 'moods/joy.png');
+    $iconBase = preg_replace('#/[^/]+$#', '', rtrim($fallbackIcon, '/')) . '/';
+}
+$iconExtension = (string) Config::get('push_icon_extension', 'png');
 
 $pdo = Database::connection();
 $moodRepo = new MoodRepository($pdo);
@@ -51,7 +56,8 @@ foreach ($rows as $row) {
             $reminderHours === 1 ? '' : 's'
         ),
         'url'  => $appUrl,
-        'icon' => $iconUrl,
+        'mood' => $mood,
+        'icon' => MoodRepository::pushIconUrl($mood, $iconBase, $iconExtension),
         'tag'  => 'mood-expiry-' . $userId,
     ];
 

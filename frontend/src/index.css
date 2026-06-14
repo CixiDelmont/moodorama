@@ -262,6 +262,81 @@ button {
   color: var(--muted);
 }
 
+.push-prompt-status-action {
+  margin: 0;
+}
+
+.push-prompt-status-btn {
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  font-size: 13px;
+  line-height: 1.45;
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-color: rgba(255, 255, 255, 0.25);
+  text-underline-offset: 3px;
+}
+
+.push-prompt-status-btn:hover:not(:disabled) {
+  color: var(--text);
+  text-decoration-color: rgba(255, 255, 255, 0.45);
+}
+
+.push-prompt-status-btn:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.push-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: rgba(12, 16, 33, 0.75);
+  backdrop-filter: blur(6px);
+}
+
+.push-modal {
+  width: min(420px, 100%);
+  padding: 20px;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: var(--panel-solid);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.35);
+  text-align: center;
+}
+
+.push-modal-title {
+  margin: 0;
+  font-size: 18px;
+  letter-spacing: -0.01em;
+}
+
+.push-modal-text {
+  margin: 10px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.push-modal-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.push-modal-actions .btn {
+  width: 100%;
+}
+
 .push-prompt-hint {
   margin: 6px 0 0;
   color: var(--muted);

@@ -8,9 +8,9 @@
   "theme_color": "#0c1021",
   "icons": [
     {
-      "src": "moods/joy.svg",
+      "src": "moods/joy.png",
       "sizes": "any",
-      "type": "image/svg+xml"
+      "type": "image/png"
     }
   ]
 }
