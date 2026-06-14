@@ -20,6 +20,15 @@ return [
     // How long a mood selection stays "active" / visible on the map.  168 hours = 7 days
     'mood_ttl_hours' => 168,
 
+    // Web Push (generate keys with: php backend/scripts/generate_vapid_keys.php)
+    'vapid_public_key'  => 'BPOzlk_b4xSHUngAO0paFrdFW7KGAv-qBd9dd_Q1v8F8R5s1k_DkFjF5yFJhXLj4wtdTG8n5cGIlCtZIfQ28KaA',
+    'vapid_private_key' => 'JTkNsn0vzshYToIB5hHAb6q3_UEii-bmNnF5gCN45Ko',
+    'vapid_subject'     => 'mailto:moodorama@tonicturtle.com',
+    // Hours before expiry to send a push reminder (matches in-app reminder window).
+    'push_reminder_hours' => 24,
+    'push_app_url'  => getenv('PUSH_APP_URL') ?: 'https://tonicturtle.com/moodorama/',
+    'push_icon_url' => getenv('PUSH_ICON_URL') ?: 'https://tonicturtle.com/moodorama/moods/joy.svg',
+
     // Allowed origins for CORS. Use ['*'] to allow any (dev only).
     // Override at deploy time with CORS_ALLOWED_ORIGINS=https://tonicturtle.com,http://localhost:5173
     'cors_allowed_origins' => [

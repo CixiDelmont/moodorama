@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { getUserId } from './user';
 import { fetchMyMood } from './api';
+import { syncPushSubscription } from './lib/push';
 import type { MyMood } from './types';
 import MoodPicker from './components/MoodPicker';
 import MoodMap from './components/MoodMap';
@@ -32,6 +33,11 @@ export default function App() {
       cancelled = true;
     };
   }, [userId]);
+
+  useEffect(() => {
+    if (!myMood?.active) return;
+    void syncPushSubscription(userId);
+  }, [userId, myMood?.active]);
 
   if (screen === 'loading') {
     return <div className="picker"><h1>Moodorama</h1><p className="subtitle">Loading…</p></div>;

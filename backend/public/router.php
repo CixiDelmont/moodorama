@@ -8,15 +8,21 @@
  *   GET  /api/moods         -> [ { id, mood, alias?, latitude, longitude, updatedAt, expiresAt }, ... ]  (active only; ?excludeSeed=1 omits seed-* rows)
  *   GET  /api/moods/me      -> current user's mood (requires ?userId=)
  *   POST /api/moods         -> upsert { userId, mood, alias?, latitude, longitude }
+ *   GET  /api/push/vapid-public-key -> { publicKey } | { publicKey: null }
+ *   POST /api/push/subscribe        -> { userId, subscription }
+ *   POST /api/push/unsubscribe      -> { userId, endpoint }
  */
 
 declare(strict_types=1);
 
 require __DIR__ . '/../src/bootstrap.php';
 
+use Moodorama\Config;
 use Moodorama\Database;
 use Moodorama\Http;
 use Moodorama\MoodRepository;
+use Moodorama\PushSubscriptionRepository;
+use Moodorama\WebPushSender;
 
 Http::applyCors();
 
@@ -25,6 +31,13 @@ $method = $_SERVER['REQUEST_METHOD'] ?? 'GET';
 if ($method === 'OPTIONS') {
     http_response_code(204);
     exit;
+}
+
+function requireUserId(string $userId): void
+{
+    if ($userId === '' || !preg_match('/^[a-zA-Z0-9_-]{8,64}$/', $userId)) {
+        Http::error('A valid userId is required', 400);
+    }
 }
 
 // Normalise the path: strip query string and any base directory prefix.
@@ -86,6 +99,43 @@ try {
             $repo = new MoodRepository(Database::connection());
             $saved = $repo->upsert($userId, $mood, $lat, $lng, $alias);
             Http::json($saved, 201);
+            // no break
+
+        case $path === '/api/push/vapid-public-key' && $method === 'GET':
+            $publicKey = WebPushSender::isConfigured()
+                ? trim((string) Config::get('vapid_public_key', ''))
+                : null;
+            Http::json(['publicKey' => $publicKey ?: null]);
+            // no break
+
+        case $path === '/api/push/subscribe' && $method === 'POST':
+            $body = Http::jsonBody();
+            $userId = trim((string) ($body['userId'] ?? ''));
+            requireUserId($userId);
+            $subscription = $body['subscription'] ?? null;
+            if (!is_array($subscription)) {
+                Http::error('subscription is required', 422);
+            }
+            try {
+                $repo = new PushSubscriptionRepository(Database::connection());
+                $repo->upsert($userId, $subscription);
+            } catch (\InvalidArgumentException $e) {
+                Http::error($e->getMessage(), 422);
+            }
+            Http::json(['ok' => true], 201);
+            // no break
+
+        case $path === '/api/push/unsubscribe' && $method === 'POST':
+            $body = Http::jsonBody();
+            $userId = trim((string) ($body['userId'] ?? ''));
+            $endpoint = trim((string) ($body['endpoint'] ?? ''));
+            requireUserId($userId);
+            if ($endpoint === '') {
+                Http::error('endpoint is required', 422);
+            }
+            $repo = new PushSubscriptionRepository(Database::connection());
+            $repo->deleteByEndpoint($userId, $endpoint);
+            Http::json(['ok' => true]);
             // no break
 
         default:

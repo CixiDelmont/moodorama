@@ -3,6 +3,7 @@ import { MOODS, MOOD_BY_ID } from '../moods';
 import type { Mood, MyMood } from '../types';
 import MoodIcon from './MoodIcon';
 import MoodExpiryReminder from './MoodExpiryReminder';
+import PushNotificationPrompt from './PushNotificationPrompt';
 import { getCurrentLocation } from '../lib/geo';
 import { submitMood } from '../api';
 
@@ -69,6 +70,11 @@ export default function MoodPicker({ userId, current, onSaved, onCancel }: Props
           Shown on the map when your hex is alone. Max {ALIAS_MAX} chars.
         </span> */}
       </label>
+
+
+      {current?.active && (
+        <PushNotificationPrompt userId={userId} className="picker-push-prompt" />
+      )}
 
       <div className="mood-grid">
         {MOODS.map((m) => (

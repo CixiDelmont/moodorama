@@ -57,6 +57,7 @@ import { buildStripeFacets } from '../lib/stripe-patterns';
 
 import Legend from './Legend';
 import MoodExpiryReminder, { useMoodExpiryReminderVisible } from './MoodExpiryReminder';
+import PushNotificationPrompt from './PushNotificationPrompt';
 
 
 
@@ -543,6 +544,8 @@ export default function MoodMap({ myMood, onChangeMood }: Props) {
           onRenew={onChangeMood}
           renewLabel="Change my mood"
         />
+
+        <PushNotificationPrompt userId={myMood.userId} />
 
         {error && <div className="error" style={{ marginTop: 12 }}>{error}</div>}
 

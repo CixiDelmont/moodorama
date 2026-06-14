@@ -244,6 +244,40 @@ button {
   text-align: center;
 }
 
+.picker-push-prompt {
+  margin-top: 12px;
+  max-width: 520px;
+  width: 100%;
+  text-align: center;
+}
+
+.push-prompt {
+  margin-top: 12px;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.push-prompt-status {
+  margin: 0;
+  color: var(--muted);
+}
+
+.push-prompt-hint {
+  margin: 6px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.push-prompt-btn {
+  width: 100%;
+}
+
+.push-prompt-error {
+  margin: 8px 0 0;
+  color: #ffb4b4;
+  font-size: 12px;
+}
+
 .picker-loading {
   position: fixed;
   inset: 0;

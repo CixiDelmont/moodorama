@@ -1,0 +1,16 @@
+{
+  "name": "Moodorama",
+  "short_name": "Moodorama",
+  "description": "A live heatmap of the world's moods",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#0c1021",
+  "theme_color": "#0c1021",
+  "icons": [
+    {
+      "src": "moods/joy.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}

@@ -76,7 +76,9 @@ final class MoodRepository
 
                     updated_at = VALUES(updated_at),
 
-                    expires_at = VALUES(expires_at)';
+                    expires_at = VALUES(expires_at),
+
+                    push_notified_at = NULL';
 
 
 
@@ -141,6 +143,64 @@ final class MoodRepository
 
 
         return array_map(fn (array $r): array => $this->mapMoodRow($r), $rows);
+
+    }
+
+
+
+    /**
+
+     * Active moods expiring within the reminder window that have push subscriptions
+
+     * and have not yet been notified for the current expiry cycle.
+
+     *
+
+     * @return list<array<string, mixed>>
+
+     */
+
+    public function findExpiringForPush(int $reminderHours): array
+
+    {
+
+        $sql = 'SELECT m.user_id, m.mood, m.expires_at,
+
+                       ps.id AS subscription_id, ps.endpoint, ps.p256dh, ps.auth
+
+                FROM moods m
+
+                INNER JOIN push_subscriptions ps ON ps.user_id = m.user_id
+
+                WHERE m.expires_at > NOW()
+
+                  AND m.expires_at <= DATE_ADD(NOW(), INTERVAL :hours HOUR)
+
+                  AND m.user_id NOT LIKE \'seed-%\'
+
+                  AND m.push_notified_at IS NULL';
+
+        $stmt = $this->pdo->prepare($sql);
+
+        $stmt->execute([':hours' => max(1, $reminderHours)]);
+
+        return $stmt->fetchAll();
+
+    }
+
+
+
+    public function markPushNotified(string $userId): void
+
+    {
+
+        $stmt = $this->pdo->prepare(
+
+            'UPDATE moods SET push_notified_at = NOW() WHERE user_id = :user_id'
+
+        );
+
+        $stmt->execute([':user_id' => $userId]);
 
     }
 

@@ -54,4 +54,25 @@ if ($hasAlias === false) {
     echo "Added alias column to moods.\n";
 }
 
-echo "Database '$name' and table 'moods' are ready.\n";
+$hasPushNotified = $pdo->query("SHOW COLUMNS FROM moods LIKE 'push_notified_at'")->fetch();
+if ($hasPushNotified === false) {
+    $pdo->exec('ALTER TABLE moods ADD COLUMN push_notified_at DATETIME NULL DEFAULT NULL AFTER expires_at');
+    echo "Added push_notified_at column to moods.\n";
+}
+
+$pdo->exec(
+    "CREATE TABLE IF NOT EXISTS push_subscriptions (
+        id           BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+        user_id      CHAR(36)        NOT NULL,
+        endpoint     VARCHAR(512)    NOT NULL,
+        p256dh       VARCHAR(255)    NOT NULL,
+        auth         VARCHAR(255)    NOT NULL,
+        created_at   DATETIME        NOT NULL,
+        updated_at   DATETIME        NOT NULL,
+        PRIMARY KEY (id),
+        UNIQUE KEY uniq_endpoint (endpoint(255)),
+        KEY idx_user (user_id)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
+);
+
+echo "Database '$name' and tables are ready.\n";

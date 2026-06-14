@@ -60,3 +60,29 @@ export function submitMood(params: {
     body: JSON.stringify(params),
   });
 }
+
+export interface PushSubscriptionPayload {
+  endpoint: string;
+  keys: {
+    p256dh: string;
+    auth: string;
+  };
+}
+
+export function fetchVapidPublicKey(): Promise<{ publicKey: string | null }> {
+  return request<{ publicKey: string | null }>('/push/vapid-public-key');
+}
+
+export function subscribePush(userId: string, subscription: PushSubscriptionPayload): Promise<{ ok: true }> {
+  return request<{ ok: true }>('/push/subscribe', {
+    method: 'POST',
+    body: JSON.stringify({ userId, subscription }),
+  });
+}
+
+export function unsubscribePush(userId: string, endpoint: string): Promise<{ ok: true }> {
+  return request<{ ok: true }>('/push/unsubscribe', {
+    method: 'POST',
+    body: JSON.stringify({ userId, endpoint }),
+  });
+}
