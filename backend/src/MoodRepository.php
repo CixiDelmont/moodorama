@@ -114,9 +114,13 @@ final class MoodRepository
 
      * All moods that are still active (not expired). These power the heatmap.
 
+     *
+
+     * @param bool $excludeSeed When true, omit rows whose user_id starts with "seed-".
+
      */
 
-    public function activeMoods(): array
+    public function activeMoods(bool $excludeSeed = false): array
 
     {
 
@@ -125,6 +129,12 @@ final class MoodRepository
                 FROM moods
 
                 WHERE expires_at > NOW()';
+
+        if ($excludeSeed) {
+
+            $sql .= " AND user_id NOT LIKE 'seed-%'";
+
+        }
 
         $rows = $this->pdo->query($sql)->fetchAll();
 

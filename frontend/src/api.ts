@@ -36,8 +36,9 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   return (text ? JSON.parse(text) : null) as T;
 }
 
-export async function fetchActiveMoods(): Promise<MoodPoint[]> {
-  const data = await request<MoodPoint[] | MoodPoint | null>('/moods');
+export async function fetchActiveMoods(excludeSeed = false): Promise<MoodPoint[]> {
+  const query = excludeSeed ? '?excludeSeed=1' : '';
+  const data = await request<MoodPoint[] | MoodPoint | null>(`/moods${query}`);
   if (Array.isArray(data)) return data;
   if (data) return [data];
   return [];

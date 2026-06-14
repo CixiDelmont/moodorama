@@ -179,11 +179,11 @@ export default function MoodMap({ myMood, onChangeMood }: Props) {
 
 
 
-  const load = useCallback(async () => {
+  const load = useCallback(async (excludeSeed = false) => {
 
     try {
 
-      const data = await fetchActiveMoods();
+      const data = await fetchActiveMoods(excludeSeed);
 
       setPoints(data);
 
@@ -574,7 +574,13 @@ export default function MoodMap({ myMood, onChangeMood }: Props) {
 
             </div>
 
-            <button type="button" className="btn" onClick={load} aria-label="Refresh moods" title="Refresh">
+            <button
+              type="button"
+              className="btn"
+              onClick={(e) => void load(e.ctrlKey)}
+              aria-label="Refresh moods"
+              title="Refresh"
+            >
               <RefreshIcon />
               <span className="btn-label">Refresh</span>
             </button>

@@ -5,7 +5,7 @@
  *
  * Routes:
  *   GET  /api/health        -> { ok: true }
- *   GET  /api/moods         -> [ { id, mood, alias?, latitude, longitude, updatedAt, expiresAt }, ... ]  (active only)
+ *   GET  /api/moods         -> [ { id, mood, alias?, latitude, longitude, updatedAt, expiresAt }, ... ]  (active only; ?excludeSeed=1 omits seed-* rows)
  *   GET  /api/moods/me      -> current user's mood (requires ?userId=)
  *   POST /api/moods         -> upsert { userId, mood, alias?, latitude, longitude }
  */
@@ -41,7 +41,8 @@ try {
 
         case $path === '/api/moods' && $method === 'GET':
             $repo = new MoodRepository(Database::connection());
-            Http::json($repo->activeMoods());
+            $excludeSeed = ($_GET['excludeSeed'] ?? '') === '1';
+            Http::json($repo->activeMoods($excludeSeed));
             // no break
 
         case $path === '/api/moods/me' && $method === 'GET':
