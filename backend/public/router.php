@@ -23,6 +23,7 @@ require __DIR__ . '/../src/bootstrap.php';
 use Moodorama\Config;
 use Moodorama\Database;
 use Moodorama\Http;
+use Moodorama\LocationObfuscation;
 use Moodorama\MoodRepository;
 use Moodorama\MoodSnapshotRepository;
 use Moodorama\PushSubscriptionRepository;
@@ -128,6 +129,9 @@ try {
             if ($lat < -90 || $lat > 90 || $lng < -180 || $lng > 180) {
                 Http::error('latitude/longitude out of range', 422);
             }
+
+            $obfuscationRadius = (float) Config::get('location_obfuscation_radius_meters', 400);
+            [$lat, $lng] = LocationObfuscation::obfuscate($lat, $lng, $obfuscationRadius);
 
             try {
                 $alias = MoodRepository::normalizeAlias($body['alias'] ?? null);

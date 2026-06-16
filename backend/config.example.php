@@ -20,6 +20,9 @@ return [
     // How long a mood selection stays "active" / visible on the map.  168 hours = 7 days
     'mood_ttl_hours' => 168,
 
+    // Random GPS offset applied on mood submit (meters). Set to 0 to disable.
+    'location_obfuscation_radius_meters' => 400,
+
     // Hourly mood snapshots (php backend/scripts/snapshot_moods.php)
     'snapshot_exclude_seed' => true,
 
